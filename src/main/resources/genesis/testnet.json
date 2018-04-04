@@ -19,13 +19,22 @@
             "address": "0xc2ed00c8e05a2296ab3be4a0accb89b648bc71df",
             "amount": 10000000,
             "note": "community distribution"
+        },
+        {
+            "address": "0x985494eb41dbcfc43bca5c8813e9df8ac25128ee",
+            "amount": 25000000,
+            "note": "dev"
+        },
+        {
+            "address": "0xfa55dbe3970f1e2a246da2ed89a272b34a75c5a2",
+            "amount": 25000000,
+            "note": "dev2"
         }
     ],
     "delegates": {
-        "semux1": "0xc583b6ad1d1cccfc00ae9113db6408f022822b20",
-        "semux2": "0xc5f32c2231ff2b60cdfa9c0d3a9c2e71774de472",
-        "semux3": "0x4908d29be8cc537386cd888dc9336aa7808c6ccc",
-        "semux4": "0xa46caf85690c5d340e1256902317efb488da858d"
+        "semux1": "0x985494eb41dbcfc43bca5c8813e9df8ac25128ee",
+        "semux2": "0xfa55dbe3970f1e2a246da2ed89a272b34a75c5a2",
+        "semux3": "0xfe755bad0d13832a09c22a377f06dc631c53af46"
     },
     "config": {
         

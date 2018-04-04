@@ -135,8 +135,23 @@ public interface SemuxApi {
     @Path("send_transaction")
     @ApiOperation(value = "Send a raw transaction", notes = "Broadcasts a raw transaction to the network.", response = SendTransactionResponse.class)
     @Produces(JSON_MIME)
-    ApiHandlerResponse sendTransaction(
+    ApiHandlerResponse sendTransactionRaw(
             @ApiParam(value = "Raw transaction", required = true) @QueryParam("raw") String raw);
+
+    @GET
+    @Path("send_transaction")
+    @ApiOperation(value = "Send a form transaction", notes = "Broadcasts a form transaction to the network.", response = SendTransactionResponse.class)
+    @Produces(JSON_MIME)
+    ApiHandlerResponse   sendTransaction(@QueryParam("hash") String hash,
+                     @QueryParam("signature") String signature,
+                     @QueryParam("network") String network,
+                     @QueryParam("transactionType") byte transactionType,
+                     @QueryParam("to") String to,
+                     @QueryParam("value") long value,
+                     @QueryParam("fee") long fee,
+                     @QueryParam("nonce") long nonce,
+                     @QueryParam("timestamp") long timestamp,
+                     @QueryParam("hexData") String hexData);
 
     @GET
     @Path("get_account")

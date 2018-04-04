@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.semux.Kernel;
+import org.semux.Network;
 import org.semux.api.response.AddNodeResponse;
 import org.semux.api.response.CreateAccountResponse;
 import org.semux.api.response.DoTransactionResponse;
@@ -56,8 +57,15 @@ import org.semux.net.NodeManager;
 import org.semux.net.filter.SemuxIpFilter;
 
 import net.i2p.crypto.eddsa.EdDSAPublicKey;
+import org.semux.util.SimpleDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SemuxApiImpl implements SemuxApi {
+
+    private static final Logger logger = LoggerFactory.getLogger(SemuxApiImpl.class);
+
+
     private Kernel kernel;
 
     public SemuxApiImpl(Kernel kernel) {
@@ -258,7 +266,7 @@ public class SemuxApiImpl implements SemuxApi {
     }
 
     @Override
-    public ApiHandlerResponse sendTransaction(String raw) {
+    public ApiHandlerResponse sendTransactionRaw(String raw) {
         if (!isSet(raw)) {
             return failure("Parameter `raw` is required");
         }
@@ -268,6 +276,36 @@ public class SemuxApiImpl implements SemuxApi {
             return new SendTransactionResponse(true);
         } catch (CryptoException e) {
             return failure("Parameter `raw` is not a valid hexadecimal string");
+        }
+    }
+
+    @Override
+    public ApiHandlerResponse sendTransaction(String hash, String signature, String network, byte transactionType, String to, long value, long fee,
+                                              long nonce, long timestamp, String data) {
+
+        byte[] hashBytes;
+        try {
+            hashBytes = Hex.decode0x(hash);
+        } catch (CryptoException ex) {
+            return failure("Parameter `hash` is not a valid hexadecimal string");
+        }
+
+        try {
+            if(data!=null) {
+                data = "";
+            }
+            byte[] bytesdata = Hex.decode(data);
+            Transaction transaction = new Transaction(hashBytes, Hex.decode(signature), Network.valueOf(network), TransactionType.of(transactionType),
+                    Hex.decode0x(to), value, fee, nonce, timestamp, bytesdata);
+
+            if(!transaction.validate(Network.valueOf(network))) {
+                return failure("Parameter `hash and signature` sign is error");
+            }
+
+            kernel.getPendingManager().addTransaction(transaction);
+            return new SendTransactionResponse(true);
+        } catch (CryptoException e) {
+            return failure("Parameter `to or signature` is not a valid hexadecimal string");
         }
     }
 

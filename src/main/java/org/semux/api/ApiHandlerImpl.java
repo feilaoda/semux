@@ -10,15 +10,21 @@ import java.util.Map;
 
 import org.semux.Kernel;
 import org.semux.api.response.GetRootResponse;
+import org.semux.gui.panel.BurningPanel;
 import org.semux.util.exception.UnreachableException;
 
 import io.netty.handler.codec.http.HttpHeaders;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.ws.rs.QueryParam;
 
 /**
  * Semux RESTful API handler implementation.
  *
  */
 public class ApiHandlerImpl implements ApiHandler {
+    private static final Logger logger = LoggerFactory.getLogger(ApiHandlerImpl.class);
 
     private final Kernel kernel;
     private final SemuxApi semuxApi;
@@ -79,7 +85,11 @@ public class ApiHandlerImpl implements ApiHandler {
             case GET_TRANSACTION:
                 return getTransaction(params);
 
-            case SEND_TRANSACTION:
+                case SEND_TRANSACTION_RAW:
+
+                    return sendTransactionRaw(params);
+
+                case SEND_TRANSACTION:
                 return sendTransaction(params);
 
             case GET_ACCOUNT:
@@ -125,6 +135,7 @@ public class ApiHandlerImpl implements ApiHandler {
                 throw new UnreachableException();
             }
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             return semuxApi.failure("Failed to process your request: " + e.getMessage());
         }
     }
@@ -231,14 +242,36 @@ public class ApiHandlerImpl implements ApiHandler {
     }
 
     /**
-     * GET /send_transaction?raw
+     * GET /send_transaction_raw?raw
+     *
+     * @param params
+     * @return
+     */
+    private ApiHandlerResponse sendTransactionRaw(Map<String, String> params) {
+        String raw = params.get("raw");
+        return semuxApi.sendTransactionRaw(raw);
+    }
+
+    /**
+     * GET /send_transaction_raw?raw
      *
      * @param params
      * @return
      */
     private ApiHandlerResponse sendTransaction(Map<String, String> params) {
-        String raw = params.get("raw");
-        return semuxApi.sendTransaction(raw);
+        String hash = params.get("hash");
+        String signature = params.get("signature");
+        String network = params.get("network");
+        byte transactionType = Byte.valueOf(params.get("transactionType"));
+        String to = params.get("to");
+        long value = Long.valueOf(params.get("value"));
+        long fee = Long.valueOf(params.get("fee"));
+        long nonce = Long.valueOf(params.get("nonce"));
+        long timestamp = Long.valueOf(params.get("timestamp"));
+        String hexData = params.get("data");
+
+
+        return semuxApi.sendTransaction(hash, signature, network, transactionType, to, value, fee, nonce, timestamp, hexData);
     }
 
     /**

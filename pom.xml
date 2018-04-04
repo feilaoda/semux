@@ -309,6 +309,21 @@
                                 <copy todir="${dist.base}/macos">
                                     <fileset dir="${dist.base}/linux"></fileset>
                                 </copy>
+                                <copy todir="${dist.base}/macos2">
+                                    <fileset dir="${dist.base}/linux">
+                                        <include name="semux.jar" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${dist.base}/macos3">
+                                    <fileset dir="${dist.base}/linux">
+                                        <include name="semux.jar" />
+                                    </fileset>
+                                </copy>
+                                <copy todir="${dist.base}/macos4">
+                                    <fileset dir="${dist.base}/linux">
+                                        <include name="semux.jar" />
+                                    </fileset>
+                                </copy>
                                 <chmod file="${dist.base}/macos/semux.jar" perm="755" />
                                 <chmod file="${dist.base}/macos/semux*.sh" perm="755" />
                             </target>
@@ -795,6 +810,13 @@
             <version>2.6</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.8</version>
+        </dependency>
+
     </dependencies>
 
     <profiles>

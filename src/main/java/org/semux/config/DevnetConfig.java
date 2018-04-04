@@ -16,6 +16,8 @@ public class DevnetConfig extends AbstractConfig {
     public DevnetConfig(String dataDir) {
         super(dataDir, Network.DEVNET, Constants.DEVNET_VERSION);
         this.netMaxInboundConnectionsPerIp = Integer.MAX_VALUE;
+        minTransactionFee = 0;
+        minDelegateBurnAmount = 0;
     }
 
     @Override

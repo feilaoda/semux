@@ -15,6 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import org.semux.Kernel;
 import org.semux.Network;
 import org.semux.config.Config;
@@ -145,6 +146,7 @@ public class SemuxBft implements Consensus {
      * 
      */
     protected void sync(long target) {
+        logger.trace("sync target, {}", target);
         if (status == Status.RUNNING) {
             // change status
             status = Status.SYNCING;
@@ -453,6 +455,7 @@ public class SemuxBft implements Consensus {
      *            new height
      */
     protected void onNewHeight(long newHeight) {
+        logger.trace("on new height, {}, {}, {}", newHeight, height, state);
         if (newHeight > height && state != State.FINALIZE) {
             // update active validators (potential overhead)
             activeValidators = channelMgr.getActiveChannels(validators);
@@ -465,6 +468,8 @@ public class SemuxBft implements Consensus {
                     .limit((int) Math.floor(activeValidators.size() * 2.0 / 3.0))
                     .max();
 
+            logger.debug("target ispresent:{}, target aslong: activeValidators:{}, validators:{}", target.isPresent(),
+                    JSON.toJSONString(activeValidators), JSON.toJSONString(validators));
             if (target.isPresent() && target.getAsLong() > height) {
                 sync(target.getAsLong());
             }
@@ -588,6 +593,8 @@ public class SemuxBft implements Consensus {
 
     @Override
     public void onMessage(Channel channel, Message msg) {
+
+        logger.trace("bft on message, {}, {}", msg, isRunning());
         // only process BFT_NEW_HEIGHT message when not running
         if (!isRunning() && msg.getCode() != MessageCode.BFT_NEW_HEIGHT) {
             return;

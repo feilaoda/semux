@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -388,7 +390,7 @@ public class TransactTest {
         delegates.put("kernelValidator2", kernelValidator2.getCoinbase().toAddressString());
 
         // mock genesis
-        return Genesis.jsonCreator(0,
+        Genesis genesis =  Genesis.jsonCreator(0,
                 "0x0000000000000000000000000000000000000000",
                 "0x0000000000000000000000000000000000000000000000000000000000000000",
                 1504742400000L,
@@ -396,5 +398,42 @@ public class TransactTest {
                 premines,
                 delegates,
                 new HashMap<>());
+
+//        @JsonProperty("number") long number,
+//        @JsonProperty("coinbase") String coinbase,
+//        @JsonProperty("parentHash") String parentHash,
+//        @JsonProperty("timestamp") long timestamp,
+//        @JsonProperty("data") String data,
+//        @JsonProperty("premine") List<Premine> premineList,
+//        @JsonProperty("delegates") Map<String, String> delegates,
+//        @JsonProperty("config") Map<String, Object> config) {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("number", genesis.getNumber());
+            jsonObject.put("coinbase", Hex.encode(genesis.getCoinbase()));
+            jsonObject.put("parentHash", Hex.encode(genesis.getParentHash()));
+            jsonObject.put("timestamp", genesis.getTimestamp());
+            jsonObject.put("data", genesis.getData());
+            List<JSONObject> premineListObject = new ArrayList<>();
+            for(Genesis.Premine premine:  genesis.getPremines().values()) {
+                JSONObject premineObject = new JSONObject();
+                premineObject.put("address", Hex.encode(premine.getAddress()));
+                premineObject.put("amount", premine.getAmount());
+                premineObject.put("note", premine.getNote());
+                premineListObject.add(premineObject);
+
+            }
+            jsonObject.put("premine", premineListObject);
+            jsonObject.put("delegates", new HashMap<String, String>());
+//            jsonObject.put("number", genesis.getNumber());
+
+
+            System.out.println(JSON.toJSONString(jsonObject));
+        return genesis;
+    }
+
+    @Test
+    public void testCreateGenesis() {
+
     }
 }

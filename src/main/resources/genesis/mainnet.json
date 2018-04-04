@@ -19,6 +19,11 @@
             "address": "0x1504263ee17446ea5f8b288e1c35d05749c0e47d",
             "amount": 10000000,
             "note": "community distribution"
+        },
+        {
+            "address": "0x81e6188a3481de8356439ac9a018c90f9eda1ab4",
+            "amount": 25000000,
+            "note": "dev"
         }
     ],
     "delegates": {

@@ -76,6 +76,31 @@ public class Transaction {
         this.hash = Hash.h256(encoded);
     }
 
+    public Transaction(byte[] hash, byte[] signature, Network network, TransactionType type, byte[] to, long value, long fee, long nonce,
+                       long timestamp, byte[] data) {
+        this.networkId = network.id();
+        this.type = type;
+        this.to = to;
+        this.value = value;
+        this.fee = fee;
+        this.nonce = nonce;
+        this.timestamp = timestamp;
+        this.data = data;
+
+        SimpleEncoder enc = new SimpleEncoder();
+        enc.writeByte(networkId);
+        enc.writeByte(type.toByte());
+        enc.writeBytes(to);
+        enc.writeLong(value);
+        enc.writeLong(fee);
+        enc.writeLong(nonce);
+        enc.writeLong(timestamp);
+        enc.writeBytes(data);
+        this.encoded = enc.toBytes();
+        this.hash = hash;
+        this.signature = Signature.fromBytes(signature);;
+    }
+
     /**
      * Create a transaction from raw bytes
      *

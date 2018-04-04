@@ -15,6 +15,8 @@ public class TestnetConfig extends AbstractConfig {
 
     public TestnetConfig(String dataDir) {
         super(dataDir, Network.TESTNET, Constants.TESTNET_VERSION);
+        minTransactionFee = 0;
+        minDelegateBurnAmount = 0;
     }
 
     @Override

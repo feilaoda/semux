@@ -19,6 +19,8 @@ public enum Action {
 
     SHOW_SEND,
 
+    SHOW_BURNING,
+
     SHOW_RECEIVE,
 
     SHOW_TRANSACTIONS,
@@ -72,4 +74,5 @@ public enum Action {
     EXPORT_PRIVATE_KEY,
 
     COPY_PRIVATE_KEY
+
 }

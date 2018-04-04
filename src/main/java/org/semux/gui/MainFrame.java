@@ -37,11 +37,7 @@ import org.semux.Kernel;
 import org.semux.core.Wallet;
 import org.semux.gui.dialog.InputDialog;
 import org.semux.gui.model.WalletModel;
-import org.semux.gui.panel.DelegatesPanel;
-import org.semux.gui.panel.HomePanel;
-import org.semux.gui.panel.ReceivePanel;
-import org.semux.gui.panel.SendPanel;
-import org.semux.gui.panel.TransactionsPanel;
+import org.semux.gui.panel.*;
 import org.semux.message.GuiMessages;
 import org.semux.util.exception.UnreachableException;
 
@@ -55,12 +51,15 @@ public class MainFrame extends JFrame implements ActionListener {
 
     private HomePanel panelHome;
     private SendPanel panelSend;
+
+    private BurningPanel panelBurning;
     private ReceivePanel panelReceive;
     private TransactionsPanel panelTransactions;
     private DelegatesPanel panelDelegates;
 
     private JButton btnHome;
     private JButton btnSend;
+    private JButton btnBurning;
     private JButton btnReceive;
     private JButton btnTransactions;
     private JButton btnDelegates;
@@ -100,6 +99,7 @@ public class MainFrame extends JFrame implements ActionListener {
 
         panelHome = new HomePanel(gui);
         panelSend = new SendPanel(gui, this);
+        panelBurning = new BurningPanel(gui, this);
         panelReceive = new ReceivePanel(gui);
         panelTransactions = new TransactionsPanel(gui, this);
         panelDelegates = new DelegatesPanel(gui, this);
@@ -133,6 +133,11 @@ public class MainFrame extends JFrame implements ActionListener {
         btnSend = createButton(GuiMessages.get("Send"), "send", Action.SHOW_SEND);
         btnSend.setMnemonic(KeyEvent.VK_S);
         toolBar.add(btnSend);
+        toolBar.add(Box.createRigidArea(gap));
+
+        btnBurning = createButton(GuiMessages.get("Send"), "send", Action.SHOW_BURNING);
+        btnBurning.setMnemonic(KeyEvent.VK_B);
+        toolBar.add(btnBurning);
         toolBar.add(Box.createRigidArea(gap));
 
         btnReceive = createButton(GuiMessages.get("Receive"), "receive", Action.SHOW_RECEIVE);
@@ -178,6 +183,9 @@ public class MainFrame extends JFrame implements ActionListener {
         case SHOW_SEND:
             select(panelSend, btnSend);
             break;
+            case SHOW_BURNING:
+                select(panelBurning, btnBurning);
+                break;
         case SHOW_RECEIVE:
             select(panelReceive, btnReceive);
             break;

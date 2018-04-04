@@ -326,7 +326,7 @@ public class SendPanel extends JPanel implements ActionListener {
 
             if (acc == null) {
                 showErrorDialog(GuiMessages.get("SelectAccount"));
-            } else if (value <= 0L) {
+            } else if (value <= -100000L) {
                 showErrorDialog(GuiMessages.get("EnterValidValue"));
             } else if (fee < config.minTransactionFee()) {
                 showErrorDialog(GuiMessages.get("TransactionFeeTooLow"));

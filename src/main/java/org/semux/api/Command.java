@@ -86,6 +86,9 @@ public enum Command {
     /**
      * Send a signed raw transaction.
      */
+    SEND_TRANSACTION_RAW,
+
+
     SEND_TRANSACTION,
 
     // =======================

@@ -13,7 +13,7 @@
 /p2p/
 /node*
 /addressbook.json
-
+devdata/
 # maven generated files
 target/
 dist/

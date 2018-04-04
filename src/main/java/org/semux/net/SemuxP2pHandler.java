@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import com.alibaba.fastjson.JSON;
 import org.semux.Kernel;
 import org.semux.Network;
 import org.semux.config.Config;
@@ -146,7 +147,7 @@ public class SemuxP2pHandler extends SimpleChannelInboundHandler<Message> {
 
     @Override
     public void channelRead0(final ChannelHandlerContext ctx, Message msg) throws InterruptedException {
-        logger.trace("Received message: {}", msg);
+        logger.trace("Received message: {}, isHandshakeDone:{} ", msg, isHandshakeDone);
         MessageWrapper mr = msgQueue.onMessageReceived(msg);
 
         switch (msg.getCode()) {
@@ -166,6 +167,7 @@ public class SemuxP2pHandler extends SimpleChannelInboundHandler<Message> {
             if (!isSupported(peer)) {
                 error = ReasonCode.INCOMPATIBLE_PROTOCOL;
             } else if (client.getPeerId().equals(peer.getPeerId()) || channelMgr.isActivePeer(peer.getPeerId())) {
+                logger.warn("DUPLICATED_PEER_ID {}", peer.getPeerId());
                 error = ReasonCode.DUPLICATED_PEER_ID;
 
             } else if (chain.getValidators().contains(peer.getPeerId()) // validator
@@ -302,6 +304,8 @@ public class SemuxP2pHandler extends SimpleChannelInboundHandler<Message> {
      * @return
      */
     private boolean isValid(HelloMessage msg) {
+        logger.info("hello is valid: {}, {}, {}, {}", JSON.toJSONString(msg), msg.validate(config), config.network() == Network.DEVNET, channel.getRemoteIp().equals(msg.getPeer().getIp()));
+
         return msg.validate(config)
                 && (config.network() == Network.DEVNET || channel.getRemoteIp().equals(msg.getPeer().getIp()));
     }
@@ -312,6 +316,8 @@ public class SemuxP2pHandler extends SimpleChannelInboundHandler<Message> {
      * @return
      */
     private boolean isValid(WorldMessage msg) {
+        logger.info("word is valid: {}, {}, {}, {}", JSON.toJSONString(msg), msg.validate(config), config.network() == Network.DEVNET, channel.getRemoteIp().equals(msg.getPeer().getIp()));
+
         return msg.validate(config)
                 && (config.network() == Network.DEVNET || channel.getRemoteIp().equals(msg.getPeer().getIp()));
     }
