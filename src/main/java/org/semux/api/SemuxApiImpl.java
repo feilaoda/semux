@@ -285,7 +285,7 @@ public class SemuxApiImpl implements SemuxApi {
 
         byte[] hashBytes;
         try {
-            hashBytes = Hex.decode0x(hash);
+            hashBytes = Hex.decode(hash);
         } catch (CryptoException ex) {
             return failure("Parameter `hash` is not a valid hexadecimal string");
         }
@@ -294,7 +294,7 @@ public class SemuxApiImpl implements SemuxApi {
             if(data!=null) {
                 data = "";
             }
-            byte[] bytesdata = Hex.decode(data);
+            byte[] bytesdata = data.getBytes();
             Transaction transaction = new Transaction(hashBytes, Hex.decode(signature), Network.valueOf(network), TransactionType.of(transactionType),
                     Hex.decode0x(to), value, fee, nonce, timestamp, bytesdata);
 

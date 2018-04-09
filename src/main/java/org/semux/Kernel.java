@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.sql.DataSource;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.bitlet.weupnp.GatewayDevice;
@@ -29,12 +30,15 @@ import org.semux.crypto.Key;
 import org.semux.db.DbFactory;
 import org.semux.db.DbName;
 import org.semux.db.LevelDb.LevelDbFactory;
+import org.semux.db.MysqlDb;
 import org.semux.net.ChannelManager;
 import org.semux.net.NodeManager;
 import org.semux.net.PeerClient;
 import org.semux.net.PeerServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.xml.sax.SAXException;
 
 import oshi.SystemInfo;
@@ -120,7 +124,13 @@ public class Kernel {
                 coinbase);
         printSystemInfo();
 
-        dbFactory = new LevelDbFactory(config.dataDir());
+        if(config.getDbType().equals("mysql")) {
+            ConfigurableApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+            DataSource dataSource = (DataSource) context.getBean("dataSource");
+            dbFactory = new MysqlDb.MysqlDbFactory(dataSource);
+        }else {
+            dbFactory = new LevelDbFactory(config.dataDir());
+        }
         chain = new BlockchainImpl(config, dbFactory);
         long number = chain.getLatestBlockNumber();
         logger.info("Latest block number = {}", number);

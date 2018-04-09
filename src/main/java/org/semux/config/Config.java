@@ -391,4 +391,6 @@ public interface Config {
      * @return
      */
     Locale locale();
+
+    String getDbType();
 }

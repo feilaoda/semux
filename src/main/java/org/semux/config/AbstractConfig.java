@@ -111,6 +111,8 @@ public abstract class AbstractConfig implements Config {
     // =========================
     protected Locale locale = Locale.getDefault();
 
+    protected String dbType = "leveldb"; //mysql
+
     /**
      * Create an {@link AbstractConfig} instance.
      *
@@ -484,6 +486,9 @@ public abstract class AbstractConfig implements Config {
                     }
                     break;
                 }
+                case "db.type":
+                    dbType = props.getProperty(name).trim();
+                    break;
                 default:
                     logger.error("Unsupported option: {} = {}", name, props.getProperty(name));
                     break;
@@ -492,5 +497,10 @@ public abstract class AbstractConfig implements Config {
         } catch (Exception e) {
             logger.error("Failed to load config file: {}", f, e);
         }
+    }
+
+    @Override
+    public String getDbType() {
+        return dbType;
     }
 }
