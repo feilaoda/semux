@@ -29,9 +29,9 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import org.semux.core.Block;
-import org.semux.core.SyncManager;
 import org.semux.core.Transaction;
 import org.semux.core.TransactionType;
+import org.semux.crypto.Hex;
 import org.semux.gui.Action;
 import org.semux.gui.SemuxGui;
 import org.semux.gui.SwingUtil;
@@ -46,7 +46,7 @@ public class HomePanel extends JPanel implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private static final int NUMBER_OF_TRANSACTIONS = 6;
+    private static final int NUMBER_OF_TRANSACTIONS = 5;
 
     private static final EnumSet<TransactionType> FEDERATED_TRANSACTION_TYPES = EnumSet.of(TransactionType.COINBASE,
             TransactionType.TRANSFER);
@@ -54,7 +54,6 @@ public class HomePanel extends JPanel implements ActionListener {
     private transient SemuxGui gui;
     private transient WalletModel model;
 
-    private JLabel syncProgress;
     private JLabel blockNum;
     private JLabel blockTime;
     private JLabel coinbase;
@@ -64,7 +63,6 @@ public class HomePanel extends JPanel implements ActionListener {
     private JLabel total;
 
     private JPanel transactions;
-    private JLabel peers;
 
     public HomePanel(SemuxGui gui) {
         this.gui = gui;
@@ -120,14 +118,6 @@ public class HomePanel extends JPanel implements ActionListener {
         total = new JLabel("");
         overview.add(total);
 
-        JLabel lblPeers = new JLabel(GuiMessages.get("Peers") + ":");
-        peers = new JLabel("");
-
-        JLabel syncProgressLabel = new JLabel(GuiMessages.get("SyncProgress") + ":");
-        overview.add(syncProgressLabel);
-        syncProgress = new JLabel("");
-        syncProgress.setName("syncProgress");
-
         // setup transactions panel
         transactions = new JPanel();
         transactions.setBorder(new TitledBorder(
@@ -140,18 +130,9 @@ public class HomePanel extends JPanel implements ActionListener {
             groupLayout.createParallelGroup(Alignment.LEADING)
                 .addGroup(groupLayout.createSequentialGroup()
                     .addGroup(groupLayout.createParallelGroup(Alignment.LEADING)
-                        .addGroup(groupLayout.createSequentialGroup()
-                            .addContainerGap()
-                            .addComponent(lblPeers)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(peers)
-                            .addPreferredGap(ComponentPlacement.UNRELATED)
-                            .addComponent(syncProgressLabel)
-                            .addPreferredGap(ComponentPlacement.RELATED)
-                            .addComponent(syncProgress))
-                        .addComponent(overview, GroupLayout.PREFERRED_SIZE, 324, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(overview, GroupLayout.PREFERRED_SIZE, 350, GroupLayout.PREFERRED_SIZE))
                     .addGap(18)
-                    .addComponent(transactions, GroupLayout.DEFAULT_SIZE, 442, Short.MAX_VALUE))
+                    .addComponent(transactions, GroupLayout.DEFAULT_SIZE, 412, Short.MAX_VALUE))
         );
         groupLayout.setVerticalGroup(
             groupLayout.createParallelGroup(Alignment.TRAILING)
@@ -161,12 +142,6 @@ public class HomePanel extends JPanel implements ActionListener {
                         .addGroup(groupLayout.createSequentialGroup()
                             .addComponent(overview, GroupLayout.PREFERRED_SIZE, 199, GroupLayout.PREFERRED_SIZE)
                             .addPreferredGap(ComponentPlacement.RELATED, 353, Short.MAX_VALUE)
-                            .addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
-                                .addComponent(lblPeers)
-                                .addComponent(peers)
-                                .addComponent(syncProgressLabel)
-                                .addComponent(syncProgress))
-
                             .addPreferredGap(ComponentPlacement.RELATED)))
                     .addGap(0))
         );
@@ -190,6 +165,7 @@ public class HomePanel extends JPanel implements ActionListener {
             String mathSign = inBound ? "+" : "-";
             String prefix = (inBound && outBound) ? "" : (mathSign);
             JLabel lblAmount = new JLabel(prefix + SwingUtil.formatValue(tx.getValue()));
+            lblAmount.setToolTipText(SwingUtil.formatValue(tx.getValue()));
             lblAmount.setHorizontalAlignment(SwingConstants.RIGHT);
 
             JLabel lblTime = new JLabel(SwingUtil.formatTimestamp(tx.getTimestamp()));
@@ -211,7 +187,7 @@ public class HomePanel extends JPanel implements ActionListener {
                                 .addPreferredGap(ComponentPlacement.RELATED, 87, Short.MAX_VALUE)
                                 .addComponent(lblAmount, GroupLayout.PREFERRED_SIZE, 128, GroupLayout.PREFERRED_SIZE))
                             .addGroup(groupLayout.createSequentialGroup()
-                                .addComponent(labelAddress, GroupLayout.DEFAULT_SIZE, 384, Short.MAX_VALUE)
+                                .addComponent(labelAddress, GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
                                 .addContainerGap())))
             );
             groupLayout.setVerticalGroup(
@@ -250,16 +226,18 @@ public class HomePanel extends JPanel implements ActionListener {
      */
     protected void refresh() {
         Block block = model.getLatestBlock();
-        this.syncProgress.setText(SyncProgressFormatter.format(model.getSyncProgress()));
         this.blockNum.setText(SwingUtil.formatNumber(block.getNumber()));
         this.blockTime.setText(SwingUtil.formatTimestamp(block.getTimestamp()));
         this.coinbase.setText(SwingUtil.getAddressAbbr(model.getCoinbase().toAddress()));
+        this.coinbase.setToolTipText(Hex.PREF + model.getCoinbase().toAddressString());
         this.status.setText(model.getStatus() == Status.VALIDATOR ? GuiMessages.get("Validator")
                 : (model.getStatus() == Status.DELEGATE ? GuiMessages.get("Delegate") : GuiMessages.get("Normal")));
         this.available.setText(SwingUtil.formatValue(model.getTotalAvailable()));
+        this.available.setToolTipText(SwingUtil.formatValue(model.getTotalAvailable()));
         this.locked.setText(SwingUtil.formatValue(model.getTotalLocked()));
-        this.peers.setText(SwingUtil.formatNumber(model.getActivePeers().size()));
+        this.locked.setToolTipText(SwingUtil.formatValue(model.getTotalLocked()));
         this.total.setText(SwingUtil.formatValue(model.getTotalAvailable() + model.getTotalLocked()));
+        this.total.setToolTipText(SwingUtil.formatValue(model.getTotalAvailable() + model.getTotalLocked()));
 
         // federate all transactions
         Set<ByteArray> hashes = new HashSet<>();
@@ -287,27 +265,5 @@ public class HomePanel extends JPanel implements ActionListener {
             transactions.add(new TransactionPanel(tx, inBound, outBound, SwingUtil.getTransactionDescription(gui, tx)));
         }
         transactions.revalidate();
-    }
-
-    /**
-     * Syncing progress formatter.
-     */
-    protected static class SyncProgressFormatter {
-
-        private SyncProgressFormatter() {
-        }
-
-        public static String format(SyncManager.Progress progress) {
-            if (progress == null) {
-                return GuiMessages.get("SyncStopped");
-            } else if (progress.getCurrentHeight() > 0 && progress.getCurrentHeight() == progress.getTargetHeight()) {
-                return GuiMessages.get("SyncFinished");
-            } else if (progress.getTargetHeight() > 0) {
-                return SwingUtil.formatPercentage(
-                        (double) progress.getCurrentHeight() / (double) progress.getTargetHeight() * 100d);
-            } else {
-                return GuiMessages.get("SyncStopped");
-            }
-        }
     }
 }

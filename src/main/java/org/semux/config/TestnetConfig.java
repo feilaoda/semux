@@ -17,6 +17,8 @@ public class TestnetConfig extends AbstractConfig {
         super(dataDir, Network.TESTNET, Constants.TESTNET_VERSION);
         minTransactionFee = 0;
         minDelegateBurnAmount = 0;
+        // testnet allows a much larger block size for performance tuning (10MB)
+        maxBlockTransactionsSize = 10 * 1024 * 1024;
     }
 
     @Override

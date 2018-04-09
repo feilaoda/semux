@@ -6,8 +6,9 @@
  */
 package org.semux.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
@@ -15,7 +16,6 @@ import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Locale;
-import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 import org.semux.config.Constants;
@@ -46,8 +46,6 @@ public class SystemUtil {
     }
 
     private static final Logger logger = LoggerFactory.getLogger(SystemUtil.class);
-
-    public static final Scanner scanner = new Scanner(System.in);
 
     public enum OsName {
         WINDOWS("Windows"),
@@ -134,7 +132,8 @@ public class SystemUtil {
             con.setConnectTimeout(Constants.DEFAULT_CONNECT_TIMEOUT);
             con.setReadTimeout(Constants.DEFAULT_READ_TIMEOUT);
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), UTF_8));
             String ip = reader.readLine().trim();
             reader.close();
 
@@ -153,52 +152,6 @@ public class SystemUtil {
         } catch (Exception e) {
             return InetAddress.getLoopbackAddress().getHostAddress();
         }
-    }
-
-    /**
-     * Reads a line from the console.
-     * 
-     * @param prompt
-     * @return
-     */
-    public static String readLine(String prompt) {
-        if (prompt != null) {
-            System.out.print(prompt);
-            System.out.flush();
-        }
-
-        return scanner.nextLine();
-    }
-
-    /**
-     * Reads a password from the console.
-     *
-     * @param prompt
-     *            A message to display before reading password
-     * @return
-     */
-    public static String readPassword(String prompt) {
-        Console console = System.console();
-
-        if (console == null) {
-            if (prompt != null) {
-                System.out.print(prompt);
-                System.out.flush();
-            }
-
-            return scanner.nextLine();
-        }
-
-        return new String(console.readPassword(prompt));
-    }
-
-    /**
-     * Reads a password from the console.
-     *
-     * @return
-     */
-    public static String readPassword() {
-        return readPassword("Please enter your password: ");
     }
 
     /**
@@ -307,8 +260,12 @@ public class SystemUtil {
      * @return
      */
     public static Object getImplementationVersion() {
-        // this doesn't work with Java 9 and above
-        String version = SemuxGui.class.getPackage().getImplementationVersion();
+        String version = null;
+        try {
+            version = IOUtil.readStreamAsString(SemuxGui.class.getClassLoader().getResourceAsStream("VERSION")).trim();
+        } catch (IOException ex) {
+            logger.warn("Failed to read version.");
+        }
 
         return version == null ? "unknown" : version;
     }
@@ -329,17 +286,33 @@ public class SystemUtil {
                 return Advapi32Util.registryGetIntValue(
                         Advapi32Util.registryGetKey(
                                 WinReg.HKEY_LOCAL_MACHINE,
-                                "SOFTWARE\\Microsoft\\VisualStudio\\10.0\\VC\\VCRedist\\x64",
+                                "SOFTWARE\\Microsoft\\VisualStudio\\11.0\\VC\\Runtimes\\x64",
                                 WinNT.KEY_READ | WinNT.KEY_WOW64_32KEY).getValue(),
                         "Installed") == 1;
             } else {
                 return Advapi32Util.registryGetIntValue(
                         WinReg.HKEY_LOCAL_MACHINE,
-                        "SOFTWARE\\Microsoft\\VisualStudio\\10.0\\VC\\VCRedist\\x86",
+                        "SOFTWARE\\Microsoft\\VisualStudio\\11.0\\VC\\Runtimes\\x86",
                         "Installed") == 1;
             }
         } catch (Win32Exception e) {
             logger.error("Failed to read windows registry", e);
+            return false;
+        }
+    }
+
+    /**
+     * Determine if the current Java runtime supports the Java Platform Module
+     * System. Credits to: https://github.com/junit-team/
+     *
+     * @return {@code true} if the Java Platform Module System is available,
+     *         otherwise {@code false}
+     */
+    public static boolean isJavaPlatformModuleSystemAvailable() {
+        try {
+            Class.forName("java.lang.Module");
+            return true;
+        } catch (ClassNotFoundException expected) {
             return false;
         }
     }

@@ -18,12 +18,15 @@ import org.semux.Kernel;
 import org.semux.Launcher;
 import org.semux.config.Config;
 import org.semux.config.Constants;
+import org.semux.config.exception.ConfigException;
 import org.semux.core.Wallet;
 import org.semux.core.exception.WalletLockedException;
 import org.semux.crypto.Hex;
 import org.semux.crypto.Key;
 import org.semux.exception.LauncherException;
 import org.semux.message.CliMessages;
+import org.semux.net.filter.exception.IpFilterJsonParseException;
+import org.semux.util.ConsoleUtil;
 import org.semux.util.SystemUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +47,10 @@ public class SemuxCli extends Launcher {
             cli.setupLogger(args);
             // start
             cli.start(args);
+        } catch (LauncherException | ConfigException | IpFilterJsonParseException exception) {
+            logger.error(exception.getMessage());
         } catch (ParseException exception) {
             logger.error(CliMessages.get("ParsingFailed", exception.getMessage()));
-        } catch (LauncherException exception) {
-            logger.error(exception.getMessage());
         }
     }
 
@@ -247,8 +250,8 @@ public class SemuxCli extends Launcher {
      * @return new password, or null if the confirmation failed
      */
     private String readNewPassword() {
-        String newPassword = SystemUtil.readPassword(CliMessages.get("EnterNewPassword"));
-        String newPasswordRe = SystemUtil.readPassword(CliMessages.get("ReEnterNewPassword"));
+        String newPassword = ConsoleUtil.readPassword(CliMessages.get("EnterNewPassword"));
+        String newPasswordRe = ConsoleUtil.readPassword(CliMessages.get("ReEnterNewPassword"));
 
         if (!newPassword.equals(newPasswordRe)) {
             logger.error(CliMessages.get("ReEnterNewPasswordIncorrect"));
@@ -307,7 +310,7 @@ public class SemuxCli extends Launcher {
 
     protected Wallet loadAndUnlockWallet() {
         if (getPassword() == null) {
-            setPassword(SystemUtil.readPassword());
+            setPassword(ConsoleUtil.readPassword());
         }
 
         Wallet wallet = loadWallet();
@@ -321,7 +324,7 @@ public class SemuxCli extends Launcher {
     /**
      * Create a new wallet with a new password from input and save the wallet file
      * to disk
-     * 
+     *
      * @return created new wallet, or null if it failed to create the wallet
      */
     protected Wallet createNewWallet() {

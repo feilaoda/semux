@@ -4,23 +4,27 @@
  * Distributed under the MIT software license, see the accompanying file
  * LICENSE or https://opensource.org/licenses/mit-license.php
  */
-package org.semux.gui.panel;
+package org.semux.gui.dialog;
 
 import org.semux.KernelMock;
 import org.semux.gui.BaseTestApplication;
 import org.semux.gui.SemuxGui;
 import org.semux.gui.model.WalletModel;
 
-public class HomePanelTestApplication extends BaseTestApplication {
+/**
+ */
+public class ConsoleDialogTestApplication extends BaseTestApplication {
 
     private static final long serialVersionUID = 1L;
 
-    HomePanel homePanel;
+    SemuxGui gui;
 
-    HomePanelTestApplication(WalletModel walletModel, KernelMock kernelMock) {
+    ConsoleDialog consoleDialog;
+
+    ConsoleDialogTestApplication(WalletModel walletModel, KernelMock kernelMock) {
         super();
-        SemuxGui gui = new SemuxGui(walletModel, kernelMock);
-        homePanel = new HomePanel(gui);
-        getContentPane().add(homePanel);
+        gui = new SemuxGui(walletModel, kernelMock);
+        consoleDialog = new ConsoleDialog(gui, this);
+        consoleDialog.setVisible(true);
     }
 }

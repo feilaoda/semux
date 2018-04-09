@@ -59,6 +59,8 @@ public enum Action {
 
     ABOUT,
 
+    CONSOLE,
+
     HELP,
 
     SHOW_ADDRESS_BOOK,

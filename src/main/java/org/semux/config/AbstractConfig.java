@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.semux.Network;
+import org.semux.config.exception.ConfigException;
 import org.semux.core.TransactionType;
 import org.semux.core.Unit;
 import org.semux.crypto.Hash;
@@ -110,6 +111,8 @@ public abstract class AbstractConfig implements Config {
     // UI
     // =========================
     protected Locale locale = Locale.getDefault();
+    protected String uiUnit = "SEM";
+    protected int uiFractionDigits = Unit.SCALE.get(uiUnit);
 
     protected String dbType = "leveldb"; //mysql
 
@@ -126,6 +129,7 @@ public abstract class AbstractConfig implements Config {
         this.networkVersion = networkVersion;
 
         init();
+        validate();
     }
 
     @Override
@@ -399,6 +403,16 @@ public abstract class AbstractConfig implements Config {
         return locale;
     }
 
+    @Override
+    public String uiUnit() {
+        return uiUnit;
+    }
+
+    @Override
+    public int uiFractionDigits() {
+        return uiFractionDigits;
+    }
+
     protected void init() {
         File f = new File(configDir(), CONFIG_FILE);
         if (!f.exists()) {
@@ -489,6 +503,14 @@ public abstract class AbstractConfig implements Config {
                 case "db.type":
                     dbType = props.getProperty(name).trim();
                     break;
+                case "ui.unit": {
+                    uiUnit = props.getProperty(name).trim();
+                    break;
+                }
+                case "ui.fractionDigits": {
+                    uiFractionDigits = Integer.parseInt(props.getProperty(name).trim());
+                    break;
+                }
                 default:
                     logger.error("Unsupported option: {} = {}", name, props.getProperty(name));
                     break;
@@ -502,5 +524,12 @@ public abstract class AbstractConfig implements Config {
     @Override
     public String getDbType() {
         return dbType;
+    }
+
+    private void validate() {
+        if (apiEnabled &&
+                ("YOUR_API_USERNAME".equals(apiUsername) || "YOUR_API_PASSWORD".equals(apiPassword))) {
+            throw new ConfigException("Please change your API username/password from the default values.");
+        }
     }
 }

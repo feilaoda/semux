@@ -6,8 +6,11 @@
  */
 package org.semux.api;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import java.io.File;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -65,6 +68,7 @@ public class SemuxApiImpl implements SemuxApi {
 
     private static final Logger logger = LoggerFactory.getLogger(SemuxApiImpl.class);
 
+    private static final Charset CHARSET = UTF_8;
 
     private Kernel kernel;
 
@@ -196,7 +200,7 @@ public class SemuxApiImpl implements SemuxApi {
     @Override
     public ApiHandlerResponse getPendingTransactions() {
         return new GetPendingTransactionsResponse(true,
-                kernel.getPendingManager().getTransactions().parallelStream()
+                kernel.getPendingManager().getPendingTransactions().parallelStream()
                         .map(pendingTransaction -> pendingTransaction.transaction)
                         .map(tx -> new Types.TransactionType(null, tx))
                         .collect(Collectors.toList()));
@@ -496,7 +500,7 @@ public class SemuxApiImpl implements SemuxApi {
                 return failure(String.format("The provided address %s doesn't belong to the wallet", address));
             }
 
-            Key.Signature signedMessage = account.sign(message.getBytes());
+            Key.Signature signedMessage = account.sign(message.getBytes(CHARSET));
             return new SignMessageResponse(true, Hex.encode0x(signedMessage.toBytes()));
         } catch (NullPointerException | IllegalArgumentException e) {
             return failure("Invalid message");
@@ -526,7 +530,7 @@ public class SemuxApiImpl implements SemuxApi {
             if (!Arrays.equals(signatureAddress, addressBytes)) {
                 isValidSignature = false;
             }
-            if (!Key.verify(message.getBytes(), sig)) {
+            if (!Key.verify(message.getBytes(CHARSET), sig)) {
                 isValidSignature = false;
             }
 

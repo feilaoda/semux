@@ -15,6 +15,11 @@ To format your code, please run the following command:
 mvn formatter:format license:format
 ```
 
+To check potential code-style and security issues, run:
+```
+mvn findbugs:check
+```
+
 For IDE users, [Eclipse Setup Guide](https://github.com/semuxproject/semux/blob/master/misc/eclipse/guide.md) and [IntelliJ IDEA Setup Guide](https://github.com/semuxproject/semux/blob/master/misc/intellij/guide.md) are also provided.
 
 ## Contributor workflow
@@ -96,6 +101,16 @@ git push -f # (force push to GitHub)
 
 Patchsets should always be focused. For example, a pull request could add a feature, fix a bug, or refactor code; but not a mixture. Please also avoid super pull requests which attempt to do too much, are overly large, or overly complex as this makes review difficult.
 
+
+## Maintainer
+
+For maintainer, make sure the PR you're going to merge passes all the checks and complies with this contributing guide. It's also advised to update the merge commit message to the following format:
+
+```
+Merge #123: Component: pull request title
+
+Optional clarification or descriptions
+```
 
 ## Copyright
 

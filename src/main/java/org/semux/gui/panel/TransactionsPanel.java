@@ -185,7 +185,7 @@ public class TransactionsPanel extends JPanel implements ActionListener {
         List<StatusTransaction> transactions = new ArrayList<>();
 
         // add pending transactions
-        transactions.addAll(gui.getKernel().getPendingManager().getTransactions()
+        transactions.addAll(gui.getKernel().getPendingManager().getPendingTransactions()
                 .parallelStream()
                 .filter(pendingTx -> {
                     for (WalletAccount acc : model.getAccounts()) {
@@ -239,7 +239,7 @@ public class TransactionsPanel extends JPanel implements ActionListener {
         return (row != -1) ? tableModel.getRow(table.convertRowIndexToModel(row)) : null;
     }
 
-    private class StatusTransaction {
+    private static class StatusTransaction {
         private String status;
         private Transaction transaction;
 

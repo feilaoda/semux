@@ -40,7 +40,6 @@ import org.semux.IntegrationTest;
 import org.semux.Kernel;
 import org.semux.Kernel.State;
 import org.semux.KernelMock;
-import org.semux.Network;
 import org.semux.api.response.DoTransactionResponse;
 import org.semux.api.response.GetAccountResponse;
 import org.semux.api.response.GetAccountTransactionsResponse;
@@ -170,7 +169,7 @@ public class TransactTest {
         // wait for transaction to be processed
         logger.info("Waiting for the transaction to be processed...");
         await().atMost(20, SECONDS).until(availableOf(kernelPremine, coinbaseOf(kernelPremine)),
-                equalTo(PREMINE * Unit.SEM - value - fee));
+                equalTo(PREMINE - value - fee));
         await().atMost(20, SECONDS).until(availableOf(kernelReceiver, coinbaseOf(kernelReceiver)),
                 equalTo(value));
 
@@ -207,7 +206,7 @@ public class TransactTest {
         // wait for transaction processing
         logger.info("Waiting for the transaction to be processed...");
         await().atMost(20, SECONDS).until(availableOf(kernelPremine, coinbaseOf(kernelPremine)),
-                equalTo(PREMINE * Unit.SEM - kernelPremine.getConfig().minDelegateBurnAmount() - fee));
+                equalTo(PREMINE - kernelPremine.getConfig().minDelegateBurnAmount() - fee));
 
         // assert that the transaction has been recorded across nodes
         assertLatestTransaction(kernelPremine, coinbaseOf(kernelPremine),
@@ -240,7 +239,7 @@ public class TransactTest {
         // wait for the vote transaction to be processed
         logger.info("Waiting for the vote transaction to be processed...");
         await().atMost(20, SECONDS).until(availableOf(kernelPremine, coinbaseOf(kernelPremine)),
-                equalTo(PREMINE * Unit.SEM - votes - fee));
+                equalTo(PREMINE - votes - fee));
 
         // assert that the vote transaction has been recorded across nodes
         assertLatestTransaction(kernelPremine, coinbaseOf(kernelPremine),
@@ -265,7 +264,7 @@ public class TransactTest {
         // wait for the vote transaction to be processed
         logger.info("Waiting for the unvote transaction to be processed...");
         await().atMost(20, SECONDS).until(availableOf(kernelPremine, coinbaseOf(kernelPremine)),
-                equalTo(PREMINE * Unit.SEM - votes - fee + unvotes - fee));
+                equalTo(PREMINE - votes - fee + unvotes - fee));
 
         // assert that the vote transaction has been recorded across nodes
         assertLatestTransaction(kernelPremine, coinbaseOf(kernelPremine),
