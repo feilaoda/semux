@@ -41,7 +41,11 @@ public enum TransactionType {
     /**
      * (0x06) Call a contract.
      */
-    CALL(0x06);
+    CALL(0x06),
+
+    BLESSBOSS(0x07),
+
+    BLESSME(0x08);
 
     private static final TransactionType[] map = new TransactionType[256];
     static {

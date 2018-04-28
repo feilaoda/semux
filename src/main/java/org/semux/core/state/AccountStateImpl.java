@@ -30,6 +30,8 @@ public class AccountStateImpl implements AccountState {
     protected static final byte TYPE_ACCOUNT = 0;
     protected static final byte TYPE_CODE = 1;
     protected static final byte TYPE_STORAGE = 2;
+    protected static final byte TYPE_INCENSE_ACCOUNT = 3;
+    protected static final byte TYPE_INCENSEPIECE_ACCOUNT = 4;
 
     protected Db accountDB;
     protected AccountStateImpl prev;
@@ -87,6 +89,24 @@ public class AccountStateImpl implements AccountState {
 
         Account acc = getAccount(address);
         acc.setAvailable(acc.getAvailable() + delta);
+        updates.put(k, acc.toBytes());
+    }
+
+    @Override
+    public void adjustIncenseAvailable(byte[] address, long delta) {
+        ByteArray k = getKey(TYPE_INCENSE_ACCOUNT , address);
+
+        Account acc = getAccount(address);
+        acc.setIncenseAvailable(acc.getAvailable() + delta);
+        updates.put(k, acc.toBytes());
+    }
+
+    @Override
+    public void adjustIncensePieceAvailable(byte[] address, long delta) {
+        ByteArray k = getKey(TYPE_INCENSEPIECE_ACCOUNT, address);
+
+        Account acc = getAccount(address);
+        acc.setIncensePieceAvailable(acc.getAvailable() + delta);
         updates.put(k, acc.toBytes());
     }
 

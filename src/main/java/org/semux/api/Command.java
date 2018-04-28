@@ -91,6 +91,11 @@ public enum Command {
 
     SEND_TRANSACTION,
 
+    SEND_BLESS_BOSS, //祈福大佬
+
+    SEND_BLESS_ME, //为自己祈福
+
+
     // =======================
     // state query
     // =======================

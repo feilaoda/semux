@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.semux.CoinType;
 import org.semux.Network;
 import org.semux.config.Constants;
 import org.semux.crypto.Hash;
@@ -42,6 +43,8 @@ public class Transaction {
     private final byte[] hash; // not serialized
     private Signature signature;
 
+    private final byte coinType; //0:coin 1:xiangliao 2:xiang
+
     /**
      * Create a new transaction.
      *
@@ -65,6 +68,14 @@ public class Transaction {
         this.timestamp = timestamp;
         this.data = data;
 
+        if(type == TransactionType.BLESSME) {
+            this.coinType = CoinType.INCENSE.id();
+        }else if(type == TransactionType.BLESSBOSS) {
+            this.coinType = CoinType.INCENSEPIECE.id();
+        }else {
+            this.coinType = CoinType.INCENSECOIN.id();
+        }
+
         SimpleEncoder enc = new SimpleEncoder();
         enc.writeByte(networkId);
         enc.writeByte(type.toByte());
@@ -73,7 +84,9 @@ public class Transaction {
         enc.writeLong(fee);
         enc.writeLong(nonce);
         enc.writeLong(timestamp);
+        enc.writeByte((byte)this.coinType);
         enc.writeBytes(data);
+
         this.encoded = enc.toBytes();
         this.hash = Hash.h256(encoded);
     }
@@ -89,6 +102,13 @@ public class Transaction {
         this.timestamp = timestamp;
         this.data = data;
 
+        if(type == TransactionType.BLESSME) {
+            this.coinType = CoinType.INCENSE.id();
+        }else if(type == TransactionType.BLESSBOSS) {
+            this.coinType = CoinType.INCENSEPIECE.id();
+        }else {
+            this.coinType = CoinType.INCENSECOIN.id();
+        }
         SimpleEncoder enc = new SimpleEncoder();
         enc.writeByte(networkId);
         enc.writeByte(type.toByte());
@@ -97,6 +117,7 @@ public class Transaction {
         enc.writeLong(fee);
         enc.writeLong(nonce);
         enc.writeLong(timestamp);
+        enc.writeByte(coinType);
         enc.writeBytes(data);
         this.encoded = enc.toBytes();
         this.hash = hash;
@@ -121,6 +142,7 @@ public class Transaction {
         this.fee = dec.readLong();
         this.nonce = dec.readLong();
         this.timestamp = dec.readLong();
+        this.coinType = dec.readByte();
         this.data = dec.readBytes();
 
         this.encoded = encoded;
@@ -313,7 +335,7 @@ public class Transaction {
     @Override
     public String toString() {
         return "Transaction [type=" + type + ", from=" + Hex.encode(getFrom()) + ", to=" + Hex.encode(to) + ", value="
-                + value + ", fee=" + fee + ", nonce=" + nonce + ", timestamp=" + timestamp + ", data="
+                + value + ", fee=" + fee + ", nonce=" + nonce + ", timestamp=" + timestamp + ", coinType="+ coinType + ", data="
                 + Hex.encode(data) + ", hash=" + Hex.encode(hash) + "]";
     }
 

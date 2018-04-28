@@ -31,6 +31,10 @@ public interface AccountState {
      */
     void adjustAvailable(byte[] address, long delta);
 
+    void adjustIncenseAvailable(byte[] address, long delta);
+
+    void adjustIncensePieceAvailable(byte[] address, long delta);
+
     /**
      * Adjusts the locked balance of an account.
      * 

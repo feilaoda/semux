@@ -13,7 +13,10 @@ import org.semux.util.SimpleEncoder;
 public class Account {
 
     private byte[] address;
-    private long available;
+    private long available; //coin avaible
+    private long incensePieceAvailable;
+    private long incenseAvailable;
+
     private long locked;
     private long nonce;
 
@@ -25,9 +28,21 @@ public class Account {
      * @param locked
      * @param nonce
      */
+    @Deprecated
     public Account(byte[] address, long available, long locked, long nonce) {
         this.address = address;
         this.available = available;
+        this.incenseAvailable = 0;
+        this.incensePieceAvailable = 0;
+        this.locked = locked;
+        this.nonce = nonce;
+    }
+
+    public Account(byte[] address, long available, long incensePieceAvailable, long incenseAvailable, long locked, long nonce) {
+        this.address = address;
+        this.available = available;
+        this.incenseAvailable = incenseAvailable;
+        this.incensePieceAvailable = incensePieceAvailable;
         this.locked = locked;
         this.nonce = nonce;
     }
@@ -42,6 +57,8 @@ public class Account {
         enc.writeLong(available);
         enc.writeLong(locked);
         enc.writeLong(nonce);
+        enc.writeLong(incensePieceAvailable);
+        enc.writeLong(incenseAvailable);
 
         return enc.toBytes();
     }
@@ -59,7 +76,11 @@ public class Account {
         long locked = dec.readLong();
         long nonce = dec.readLong();
 
-        return new Account(address, available, locked, nonce);
+        long incensePieceAvailable = dec.readLong();
+        long incenseAvailable = dec.readLong();
+
+
+        return new Account(address, available, incensePieceAvailable, incenseAvailable, locked, nonce);
     }
 
     /**
@@ -125,9 +146,28 @@ public class Account {
         this.nonce = nonce;
     }
 
+
+    public long getIncensePieceAvailable() {
+        return incensePieceAvailable;
+    }
+
+    public void setIncensePieceAvailable(long incensePieceAvailable) {
+        this.incensePieceAvailable = incensePieceAvailable;
+    }
+
+    public long getIncenseAvailable() {
+        return incenseAvailable;
+    }
+
+    public void setIncenseAvailable(long incenseAvailable) {
+        this.incenseAvailable = incenseAvailable;
+    }
+
     @Override
     public String toString() {
-        return "Account [address=" + Hex.encode(address) + ", available=" + available + ", locked=" + locked
+        return "Account [address=" + Hex.encode(address) + ", available=" + available + ", incense piece available=" + incensePieceAvailable  + ", incense available=" + incenseAvailable + ", locked=" + locked
                 + ", nonce=" + nonce + "]";
     }
+
+
 }
